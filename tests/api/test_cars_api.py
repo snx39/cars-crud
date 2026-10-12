@@ -105,3 +105,8 @@ def test_openapi_documents_all_five_crud_operations(client):
     schema = client.get("/openapi.json").json()
     assert {"get", "post"} <= schema["paths"]["/api/cars"].keys()
     assert {"get", "put", "delete"} <= schema["paths"]["/api/cars/{car_id}"].keys()
+
+def test_health_endpoint():
+    response = client.get("/health")
+    assert response.status_code == 200
+

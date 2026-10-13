@@ -1,0 +1,44 @@
+name: Cars CRUD Tests
+
+# 仅针对目标分支main的pull_request触发，不要写push触发器
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      # 下载仓库代码到runner虚拟机
+      - name: Download repository code
+        uses: actions/checkout@v7
+
+      # 设置Python3.12环境
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # 安装项目测试依赖 requirements-dev.txt
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      # 安装Playwright Chromium + Linux系统依赖（E2E测试必须）
+      - name: Install Playwright Chromium with OS dependencies
+        run: python -m playwright install --with-deps chromium
+
+      # 4组测试，分开独立命名step
+      - name: Run unit tests
+        run: python -m pytest tests/unit -q
+
+      - name: Run integration tests
+        run: python -m pytest tests/integration -q
+
+      - name: Run API tests
+        run: python -m pytest tests/api -q
+
+      - name: Run E2E tests
+        run: python -m pytest tests/e2e -q
